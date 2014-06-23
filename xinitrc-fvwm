@@ -1,0 +1,21 @@
+#!/bin/sh
+
+[ -f $HOME/.Xdefaults ] &&  xrdb < $HOME/.Xdefaults
+
+xset m 5 10
+
+xhost + > /dev/null 2>&1
+xsetroot -solid black
+
+#DISPLAY=:0.1 xsetroot -solid black > /dev/null 2>&1
+#DISPLAY=:0.2 xsetroot -solid black > /dev/null 2>&1
+
+xset -b
+
+eval 'dbus-launch --sh-syntax'
+gconftool-2 --spawn
+
+xterm -C -geometry 81x2-0+0 -sl 128 -j -iconic &
+#gnome-terminals &
+
+exec fvwm >/dev/null 2>&1
