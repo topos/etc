@@ -1,45 +1,38 @@
 help:; @echo "make install"
 
-install: aptitude pkgs fonts java ghc postgresql emacs compression gems
+install: pkgs fonts emacs compression gems
 
-PKGS = ruby ruby-dev rake ksh fvwm git unity-tweak-tool mesa-utils imagemagick diffuse source-highlight flex bison
-pkgs:; for p in ${PKGS}; do sudo aptitude install -y $$p; done
+PKGS = ruby ruby-dev rake ksh fvwm git diffuse source-highlight flex bison g++
+pkgs:
+	for p in ${PKGS}; do sudo apt install -y $$p; done
 
 LIBS = libgconf2-4 libgconf2-dev libnss3-dev libnss3-1d libnss3-tools libudev-dev libxss-dev libxss-dev libxml2-dev libncurses-dev libgpm-dev libgmp10-dev libgmp10 libmpfr-dev libmpc-dev libisl-dev libcloog-isl-dev
 libs:
-	for p in ${LIBS}; do sudo aptitude install -y $$p; done
+	for p in ${LIBS}; do sudo apt install -y $$p; done
 
 FONTS = ttf-mscorefonts-installer
 fonts:
-	for p in ${FONTS}; do sudo aptitude install -y $$p; done
-	if [ ! -d /usr/share/fonts/macfonts ]; then \
-		tar xf macfonts.tar.gz; \
-		sudo mv macfonts /usr/share/fonts; \
-	fi
-	sudo aptitude install -y edubuntu-fonts emacs-intl-fonts xfonts-100dpi xfonts-100dpi-transcoded xfonts-75dpi xfont-75dpi-transcoded gsfont gsfonts-other gsfonts-x11
+	for p in ${FONTS}; do sudo apt install -y $$p; done
+	sudo apt install -y edubuntu-fonts emacs-intl-fonts xfonts-100dpi xfonts-100dpi-transcoded gsfonts gsfonts-other gsfonts-x11
 	sudo fc-cache -f -v
 
+update:; sudo apt update -y
 
-update:; sudo aptitude update -y
+upgrade:; sudo apt upgrade -y
 
-upgrade:; sudo aptitude upgrade -y
+full-upgrade:; sudo apt full-upgrade -y
 
-full-upgrade:; sudo aptitude full-upgrade -y
+emacs:; sudo apt install -y emacs24 emacs24-el emacs-goodies-el emacs-goodies-extra-el haskell-mode
 
-aptitude:; sudo apt-get install -y aptitude
-emacs:; sudo aptitude install -y emacs24 emacs24-el emacs-goodies-el emacs-goodies-extra-el
+google-chrome: libs
+	sudo dpkg --install google-chrome-stable_current_amd64.deb
 
 java:;	sudo add-apt-repository ppa:webupd8team/java
-	sudo aptitude update -y
-	sudo aptitude install -y oracle-java8-installer
-
-ghc:; sudo aptitude install -y ghc libghc-cabal-dev cabal-install haskell-mode
-
-postgresql:
-	sudo aptitude install -y postgresql postgresql-client postgresql-server-dev-9.1 libpq-dev
+	sudo apt update -y
+	sudo apt install -y oracle-java8-installer
 
 media: media-ppa
-	sudo aptitude install -y non-free-codecs libdvdcss
+	sudo apt install -y non-free-codecs libdvdcss
 
 media-ppa:; sudo -E wget --output-document=/etc/apt/sources.list.d/medibuntu.list http://www.medibuntu.org/sources.list.d/$$(lsb_release -cs).list && sudo apt-get --quiet update && sudo apt-get --yes --quiet --allow-unauthenticated install medibuntu-keyring && sudo apt-get --quiet update
 
@@ -54,19 +47,19 @@ media-ppa:; sudo -E wget --output-document=/etc/apt/sources.list.d/medibuntu.lis
 # sudo apt-get install nvidia-current
 
 
-compression:; sudo apt-get install p7zip-rar p7zip-full unace unrar zip unzip sharutils rar uudeview mpack arj cabextract file-roller
+compression:; sudo apt install -y p7zip-rar p7zip-full unace unrar zip unzip sharutils rar uudeview mpack arj cabextract file-roller
 
 dev: tools
-	for i in $$(aptitude search -F '%p' x11|grep dev|grep -v :i386|grep -v libhgc); do sudo aptitude install -y $$i; done
-	sudo aptitude install -y libtiff-dev libtiff-tools libjpeg8-dev libgif-dev libxpm-dev
-	sudo aptitude install -y xserver-xorg-input-mtrack
-	sudo aptitude install -y ubuntu-dev-tools libgmp3-dev libgmp-dev libmpfr-dev libmpc-dev bison flex gcc-multilib xz-utils
-	sudo aptitude install -y freeglut3-dev
+	for i in $$(apt search -F '%p' x11|grep dev|grep -v :i386|grep -v libhgc); do sudo apt install -y $$i; done
+	sudo apt install -y libtiff-dev libtiff-tools libjpeg8-dev libgif-dev libxpm-dev
+	sudo apt install -y xserver-xorg-input-mtrack
+	sudo apt install -y ubuntu-dev-tools libgmp3-dev libgmp-dev libmpfr-dev libmpc-dev bison flex gcc-multilib xz-utils
+	sudo apt install -y freeglut3-dev
 
-dev-info:; aptitude search -F '%p' x11|grep dev|grep -v :i386|grep -v libhgc
+dev-info:; apt search -F '%p' x11|grep dev|grep -v :i386|grep -v libhgc
 
 
-tools:;	sudo aptitude install -y curl wget imagemagick graphicsmagick-imagemagick-compat
+tools:;	sudo apt install -y curl wget imagemagick graphicsmagick-imagemagick-compat
 
 default-keyboard:
 	sudo cp keyboard /etc/default/keyboard
@@ -75,7 +68,7 @@ default-keyboard:
 gemrc:; echo 'gem: --no-ri --no-rdoc' >> ~/.gemrc
 
 GEMS=rake smart_colored
-gems: 
+gems:
 	@for i in ${GEMS}; do \
 		gem=$$(echo $$i|sed 's/:/ -v /1'); \
 		echo $$gem; \
@@ -90,19 +83,6 @@ buildr:
 			sudo gem install --no-ri --no-rdoc $@; \
 		fi; \
 	fi
-
-xmonad:; sudo aptitude install -y libghc-xmonad-dev libghc-xmonad-contrib-dev libghc-xmonad-doc xmonad
-
-google-chrome:
-	wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-	sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
-	sudo apt-get update -y
-	sudo apt-get install google-chrome-stable
-
-app-containers:
-	sudo apt-get install -y lxd lxd-client docker.io
-
-mbp-trackpad:; sudo cp 99-mbp-trackpad.conf /usr/share/X11/xorg.conf.d
 
 sudo:; sudo cp ml.sudo /etc/sudoers.d/ml
 
