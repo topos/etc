@@ -3,7 +3,8 @@ help:; @echo "make install"
 install: aptitude pkgs fonts java ghc postgresql emacs compression gems
 
 PKGS = ruby ruby-dev rake ksh fvwm git unity-tweak-tool mesa-utils imagemagick diffuse source-highlight flex bison
-pkgs:; for p in ${PKGS}; do sudo aptitude install -y $$p; done
+pkgs:
+	for p in ${PKGS}; do sudo aptitude install -y $$p; done
 
 LIBS = libgconf2-4 libgconf2-dev libnss3-dev libnss3-1d libnss3-tools libudev-dev libxss-dev libxss-dev libxml2-dev libncurses-dev libgpm-dev libgmp10-dev libgmp10 libmpfr-dev libmpc-dev libisl-dev libcloog-isl-dev
 libs:
